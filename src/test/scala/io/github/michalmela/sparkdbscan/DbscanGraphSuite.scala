@@ -14,17 +14,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.spark.mllib.clustering.dbscan
+package io.github.michalmela.sparkdbscan
 
-import org.scalatest.FunSuite
-import org.scalatest.Matchers
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
-class DBSCANGraphSuite extends FunSuite with Matchers  {
+class DbscanGraphSuite extends AnyFunSuite with Matchers  {
   
   
   test("should return connected") {
     
-    val graph = DBSCANGraph[Int]().connect(1, 3)
+    val graph = DbscanGraph[Int]().connect(1, 3)
     
     val connected = graph.getConnected(1)
     
@@ -34,7 +34,7 @@ class DBSCANGraphSuite extends FunSuite with Matchers  {
 
   test("should return doubly connected") {
     
-    val graph = DBSCANGraph[Int]().connect(1, 3).connect(3, 4)
+    val graph = DbscanGraph[Int]().connect(1, 3).connect(3, 4)
     
     val connected = graph.getConnected(1)
     
@@ -44,7 +44,7 @@ class DBSCANGraphSuite extends FunSuite with Matchers  {
 
   test("should return none for vertex") {
     
-    val graph = DBSCANGraph[Int]().addVertex(5).connect(1, 3)
+    val graph = DbscanGraph[Int]().addVertex(5).connect(1, 3)
     
     val connected = graph.getConnected(5)
     
@@ -54,7 +54,7 @@ class DBSCANGraphSuite extends FunSuite with Matchers  {
 
   test("should return none for unknown") {
     
-    val graph = DBSCANGraph[Int]().addVertex(5).connect(1, 3)
+    val graph = DbscanGraph[Int]().addVertex(5).connect(1, 3)
     
     val connected = graph.getConnected(6)
     

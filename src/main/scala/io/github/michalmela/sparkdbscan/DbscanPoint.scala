@@ -14,16 +14,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.spark.mllib.clustering.dbscan
+package io.github.michalmela.sparkdbscan
 
 import org.apache.spark.mllib.linalg.Vector
 
-case class DBSCANPoint(val vector: Vector) {
+case class DbscanPoint(val vector: Vector) {
 
   def x = vector(0)
   def y = vector(1)
 
-  def distanceSquared(other: DBSCANPoint): Double = {
+  def distanceSquared(other: DbscanPoint): Double = {
     val dx = other.x - x
     val dy = other.y - y
     (dx * dx) + (dy * dy)

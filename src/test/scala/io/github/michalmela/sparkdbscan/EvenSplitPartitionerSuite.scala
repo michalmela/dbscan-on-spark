@@ -14,31 +14,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.spark.mllib.clustering.dbscan
+package io.github.michalmela.sparkdbscan
 
-import org.scalatest.FunSuite
-import org.scalatest.Matchers
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
-class EvenSplitPartitionerSuite extends FunSuite with Matchers {
+class EvenSplitPartitionerSuite extends AnyFunSuite with Matchers {
   test("should find partitions") {
 
-    val section1 = (DBSCANRectangle(0, 0, 1, 1), 3)
-    val section2 = (DBSCANRectangle(0, 2, 1, 3), 6)
-    val section3 = (DBSCANRectangle(1, 1, 2, 2), 7)
-    val section4 = (DBSCANRectangle(1, 0, 2, 1), 2)
-    val section5 = (DBSCANRectangle(2, 0, 3, 1), 5)
-    val section6 = (DBSCANRectangle(2, 2, 3, 3), 4)
+    val section1 = (DbscanRectangle(0, 0, 1, 1), 3)
+    val section2 = (DbscanRectangle(0, 2, 1, 3), 6)
+    val section3 = (DbscanRectangle(1, 1, 2, 2), 7)
+    val section4 = (DbscanRectangle(1, 0, 2, 1), 2)
+    val section5 = (DbscanRectangle(2, 0, 3, 1), 5)
+    val section6 = (DbscanRectangle(2, 2, 3, 3), 4)
 
     val sections = Set(section1, section2, section3, section4, section5, section6)
 
     val partitions = EvenSplitPartitioner.partition(sections, 9, 1)
 
     val expected = List(
-      (DBSCANRectangle(1, 2, 3, 3), 4),
-      (DBSCANRectangle(0, 2, 1, 3), 6),
-      (DBSCANRectangle(0, 1, 3, 2), 7),
-      (DBSCANRectangle(2, 0, 3, 1), 5),
-      (DBSCANRectangle(0, 0, 2, 1), 5))
+      (DbscanRectangle(1, 2, 3, 3), 4),
+      (DbscanRectangle(0, 2, 1, 3), 6),
+      (DbscanRectangle(0, 1, 3, 2), 7),
+      (DbscanRectangle(2, 0, 3, 1), 5),
+      (DbscanRectangle(0, 0, 2, 1), 5))
 
     partitions should equal(expected)
 
@@ -46,16 +46,16 @@ class EvenSplitPartitionerSuite extends FunSuite with Matchers {
 
   test("should find two splits") {
 
-    val section1 = (DBSCANRectangle(0, 0, 1, 1), 3)
-    val section2 = (DBSCANRectangle(2, 2, 3, 3), 4)
-    val section3 = (DBSCANRectangle(0, 1, 1, 2), 2)
+    val section1 = (DbscanRectangle(0, 0, 1, 1), 3)
+    val section2 = (DbscanRectangle(2, 2, 3, 3), 4)
+    val section3 = (DbscanRectangle(0, 1, 1, 2), 2)
 
     val sections = Set(section1, section2, section3)
 
     val partitions = EvenSplitPartitioner.partition(sections, 4, 1)
 
-    partitions(0) should equal((DBSCANRectangle(1, 0, 3, 3), 4))
-    partitions(1) should equal((DBSCANRectangle(0, 1, 1, 3), 2))
+    partitions(0) should equal((DbscanRectangle(1, 0, 3, 3), 4))
+    partitions(1) should equal((DbscanRectangle(0, 1, 1, 3), 2))
 
   }
 }

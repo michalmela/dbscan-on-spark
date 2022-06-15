@@ -14,34 +14,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.spark.mllib.clustering.dbscan
+package io.github.michalmela.sparkdbscan
 
 import scala.annotation.tailrec
 
 /**
  * Top level method for creating a DBSCANGraph
  */
-object DBSCANGraph {
+object DbscanGraph {
 
   /**
    * Create an empty graph
    */
-  def apply[T](): DBSCANGraph[T] = new DBSCANGraph(Map[T, Set[T]]())
+  def apply[T](): DbscanGraph[T] = new DbscanGraph(Map[T, Set[T]]())
 
 }
 
 /**
  * An immutable unweighted graph with vertexes and edges
  */
-class DBSCANGraph[T] private (nodes: Map[T, Set[T]]) extends Serializable {
+class DbscanGraph[T] private(nodes: Map[T, Set[T]]) extends Serializable {
 
   /**
    * Add the given vertex `v` to the graph
    *
    */
-  def addVertex(v: T): DBSCANGraph[T] = {
+  def addVertex(v: T): DbscanGraph[T] = {
     nodes.get(v) match {
-      case None    => new DBSCANGraph(nodes + (v -> Set()))
+      case None    => new DbscanGraph(nodes + (v -> Set()))
       case Some(_) => this
     }
   }
@@ -49,10 +49,10 @@ class DBSCANGraph[T] private (nodes: Map[T, Set[T]]) extends Serializable {
   /**
    * Insert an edge from `from` to `to`
    */
-  def insertEdge(from: T, to: T): DBSCANGraph[T] = {
+  def insertEdge(from: T, to: T): DbscanGraph[T] = {
     nodes.get(from) match {
-      case None       => new DBSCANGraph(nodes + (from -> Set(to)))
-      case Some(edge) => new DBSCANGraph(nodes + (from -> (edge + to)))
+      case None       => new DbscanGraph(nodes + (from -> Set(to)))
+      case Some(edge) => new DbscanGraph(nodes + (from -> (edge + to)))
     }
   }
 
@@ -60,7 +60,7 @@ class DBSCANGraph[T] private (nodes: Map[T, Set[T]]) extends Serializable {
    * Insert a vertex from `one` to `another`, and from `another` to `one`
    *
    */
-  def connect(one: T, another: T): DBSCANGraph[T] = {
+  def connect(one: T, another: T): DbscanGraph[T] = {
     insertEdge(one, another).insertEdge(another, one)
   }
 

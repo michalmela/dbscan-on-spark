@@ -14,29 +14,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.spark.mllib.clustering.dbscan
+package io.github.michalmela.sparkdbscan
 
 import java.net.URI
 
 import scala.io.Source
 
-import org.scalatest.FunSuite
-import org.scalatest.Matchers
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 import org.apache.spark.mllib.linalg.Vectors
 
-class LocalDBSCANArcherySuite extends FunSuite with Matchers {
+class LocalDbscanArcherySuite extends AnyFunSuite with Matchers {
 
   private val dataFile = "labeled_data.csv"
 
   test("should cluster") {
 
-    val labeled: Map[DBSCANPoint, Double] =
-      new LocalDBSCANArchery(eps = 0.3F, minPoints = 10)
+    val labeled: Map[DbscanPoint, Double] =
+      new LocalDbscanArchery(eps = 0.3F, minPoints = 10)
         .fit(getRawData(dataFile))
         .map(l => (l, l.cluster.toDouble))
         .toMap
 
-    val expected: Map[DBSCANPoint, Double] = getExpectedData(dataFile).toMap
+    val expected: Map[DbscanPoint, Double] = getExpectedData(dataFile).toMap
 
     labeled.foreach {
       case (key, value) => {
@@ -52,23 +52,23 @@ class LocalDBSCANArcherySuite extends FunSuite with Matchers {
 
   }
 
-  def getExpectedData(file: String): Iterator[(DBSCANPoint, Double)] = {
+  def getExpectedData(file: String): Iterator[(DbscanPoint, Double)] = {
     Source
       .fromFile(getFile(file))
       .getLines()
       .map(s => {
         val vector = Vectors.dense(s.split(',').map(_.toDouble))
-        val point = DBSCANPoint(vector)
+        val point = DbscanPoint(vector)
         (point, vector(2))
       })
   }
 
-  def getRawData(file: String): Iterable[DBSCANPoint] = {
+  def getRawData(file: String): Iterable[DbscanPoint] = {
 
     Source
       .fromFile(getFile(file))
       .getLines()
-      .map(s => DBSCANPoint(Vectors.dense(s.split(',').map(_.toDouble))))
+      .map(s => DbscanPoint(Vectors.dense(s.split(',').map(_.toDouble))))
       .toIterable
   }
 

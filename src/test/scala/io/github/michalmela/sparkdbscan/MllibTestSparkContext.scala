@@ -14,15 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package org.apache.spark.mllib.util
-
-import org.scalatest.Suite
-import org.scalatest.BeforeAndAfterAll
+package io.github.michalmela.sparkdbscan
 
 import org.apache.spark.{SparkConf, SparkContext}
+import org.scalatest.{BeforeAndAfterAll, Suite}
 
-trait MLlibTestSparkContext extends BeforeAndAfterAll { self: Suite =>
+trait MllibTestSparkContext extends BeforeAndAfterAll {
+  self: Suite =>
   @transient var sc: SparkContext = _
 
   override def beforeAll() {

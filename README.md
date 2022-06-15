@@ -1,5 +1,13 @@
 # DBSCAN on Spark
 
+### Fork info
+
+Fork of https://github.com/irvingc/dbscan-on-spark
+- compatible with scala 2.12 and Spark 3
+- DBSCAN class names renamed to Dbscan because otherwise it looks like a name of a constant
+- jfrog devops
+- repackaged to remove potential confusion
+
 ### Overview
 
 This is an implementation of the [DBSCAN clustering algorithm](http://en.wikipedia.org/wiki/DBSCAN) 
@@ -11,7 +19,7 @@ I have also created a [visual guide](http://www.irvingc.com/visualizing-dbscan) 
 ### Current vesion of DBSCAN is dbscan-on-spark_2.10:0.2.0-SNAPSHOT
 Be aware that current version of DBSCAN in this repo  is  :
 	<groupId>com.irvingc.spark</groupId>
-	<artifactId>**dbscan-on-spark_2.10**</artifactId>
+	<artifactId>**dbscan-on-spark_2.12**</artifactId>
 	<version>**0.2.0-SNAPSHOT**</version>
 It is not present in any  official repository and to make it work, you need to build it yourself.
 ### Getting DBSCAN on Spark
@@ -44,13 +52,13 @@ need to account for the scala version (the example is for Scala 2.10):
 
 	<dependency>
 		<groupId>com.irvingc.spark</groupId>
-		<artifactId>dbscan_2.10</artifactId>
+		<artifactId>dbscan_2.12</artifactId>
 		<version>0.1.0</version>
 	</dependency>
 
 
 ```
-DBSCAN on Spark is built against Scala 2.10.
+DBSCAN on Spark is built against Scala 2.12.
 
 
 ### Example usage 
@@ -61,31 +69,31 @@ showing how DBSCAN on Spark can be used. The following however should give you a
 good idea of how it should be included in your application.
 
 ```scala
-import org.apache.spark.mllib.clustering.dbscan.DBSCAN
+import io.github.michalmela.sparkdbscan.Dbscan
 
-object DBSCANSample {
+object DbsacnSample {
 
-  def main(args: Array[String]) {
+	def main(args: Array[String]) {
 
-    val conf = new SparkConf().setAppName("DBSCAN Sample")
-    val sc = new SparkContext(conf)
+		val conf = new SparkConf().setAppName("DBSCAN Sample")
+		val sc = new SparkContext(conf)
 
-    val data = sc.textFile(src)
+		val data = sc.textFile(src)
 
-    val parsedData = data.map(s => Vectors.dense(s.split(',').map(_.toDouble))).cache()
+		val parsedData = data.map(s => Vectors.dense(s.split(',').map(_.toDouble))).cache()
 
-    log.info(s"EPS: $eps minPoints: $minPoints")
+		log.info(s"EPS: $eps minPoints: $minPoints")
 
-    val model = DBSCAN.train(
-      parsedData,
-      eps = eps,
-      minPoints = minPoints,
-      maxPointsPerPartition = maxPointsPerPartition)
+		val model = Dbscan.train(
+			parsedData,
+			eps = eps,
+			minPoints = minPoints,
+			maxPointsPerPartition = maxPointsPerPartition)
 
-    model.labeledPoints.map(p =>  s"${p.x},${p.y},${p.cluster}").saveAsTextFile(dest)
+		model.labeledPoints.map(p => s"${p.x},${p.y},${p.cluster}").saveAsTextFile(dest)
 
-    sc.stop()
-  }
+		sc.stop()
+	}
 }
 ```
 

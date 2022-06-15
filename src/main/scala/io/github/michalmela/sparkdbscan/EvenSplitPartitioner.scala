@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.spark.mllib.clustering.dbscan
+package io.github.michalmela.sparkdbscan
 
 import scala.annotation.tailrec
 
@@ -26,9 +26,9 @@ import org.apache.spark.internal.Logging
 object EvenSplitPartitioner {
 
   def partition(
-    toSplit: Set[(DBSCANRectangle, Int)],
-    maxPointsPerPartition: Long,
-    minimumRectangleSize: Double): List[(DBSCANRectangle, Int)] = {
+                 toSplit: Set[(DbscanRectangle, Int)],
+                 maxPointsPerPartition: Long,
+                 minimumRectangleSize: Double): List[(DbscanRectangle, Int)] = {
     new EvenSplitPartitioner(maxPointsPerPartition, minimumRectangleSize)
       .findPartitions(toSplit)
   }
@@ -39,13 +39,13 @@ class EvenSplitPartitioner(
   maxPointsPerPartition: Long,
   minimumRectangleSize: Double) extends Logging {
 
-  type RectangleWithCount = (DBSCANRectangle, Int)
+  type RectangleWithCount = (DbscanRectangle, Int)
 
   def findPartitions(toSplit: Set[RectangleWithCount]): List[RectangleWithCount] = {
 
     val boundingRectangle = findBoundingRectangle(toSplit)
 
-    def pointsIn = pointsInRectangle(toSplit, _: DBSCANRectangle)
+    def pointsIn = pointsInRectangle(toSplit, _: DbscanRectangle)
 
     val toPartition = List((boundingRectangle, pointsIn(boundingRectangle)))
     val partitioned = List[RectangleWithCount]()
@@ -62,7 +62,7 @@ class EvenSplitPartitioner(
   private def partition(
     remaining: List[RectangleWithCount],
     partitioned: List[RectangleWithCount],
-    pointsIn: (DBSCANRectangle) => Int): List[RectangleWithCount] = {
+    pointsIn: (DbscanRectangle) => Int): List[RectangleWithCount] = {
 
     remaining match {
       case (rectangle, count) :: rest =>
@@ -70,7 +70,7 @@ class EvenSplitPartitioner(
 
           if (canBeSplit(rectangle)) {
             logTrace(s"About to split: $rectangle")
-            def cost = (r: DBSCANRectangle) => ((pointsIn(rectangle) / 2) - pointsIn(r)).abs
+            def cost = (r: DbscanRectangle) => ((pointsIn(rectangle) / 2) - pointsIn(r)).abs
             val (split1, split2) = split(rectangle, cost)
             logTrace(s"Found split: $split1, $split2")
             val s1 = (split1, pointsIn(split1))
@@ -93,8 +93,8 @@ class EvenSplitPartitioner(
   }
 
   def split(
-    rectangle: DBSCANRectangle,
-    cost: (DBSCANRectangle) => Int): (DBSCANRectangle, DBSCANRectangle) = {
+             rectangle: DbscanRectangle,
+             cost: (DbscanRectangle) => Int): (DbscanRectangle, DbscanRectangle) = {
 
     val smallestSplit =
       findPossibleSplits(rectangle)
@@ -116,13 +116,13 @@ class EvenSplitPartitioner(
   /**
    * Returns the box that covers the space inside boundary that is not covered by box
    */
-  private def complement(box: DBSCANRectangle, boundary: DBSCANRectangle): DBSCANRectangle =
+  private def complement(box: DbscanRectangle, boundary: DbscanRectangle): DbscanRectangle =
     if (box.x == boundary.x && box.y == boundary.y) {
       if (boundary.x2 >= box.x2 && boundary.y2 >= box.y2) {
         if (box.y2 == boundary.y2) {
-          DBSCANRectangle(box.x2, box.y, boundary.x2, boundary.y2)
+          DbscanRectangle(box.x2, box.y, boundary.x2, boundary.y2)
         } else if (box.x2 == boundary.x2) {
-          DBSCANRectangle(box.x, box.y2, boundary.x2, boundary.y2)
+          DbscanRectangle(box.x, box.y2, boundary.x2, boundary.y2)
         } else {
           throw new IllegalArgumentException("rectangle is not a proper sub-rectangle")
         }
@@ -136,15 +136,15 @@ class EvenSplitPartitioner(
   /**
    * Returns all the possible ways in which the given box can be split
    */
-  private def findPossibleSplits(box: DBSCANRectangle): Set[DBSCANRectangle] = {
+  private def findPossibleSplits(box: DbscanRectangle): Set[DbscanRectangle] = {
 
     val xSplits = (box.x + minimumRectangleSize) until box.x2 by minimumRectangleSize
 
     val ySplits = (box.y + minimumRectangleSize) until box.y2 by minimumRectangleSize
 
     val splits =
-      xSplits.map(x => DBSCANRectangle(box.x, box.y, x, box.y2)) ++
-        ySplits.map(y => DBSCANRectangle(box.x, box.y, box.x2, y))
+      xSplits.map(x => DbscanRectangle(box.x, box.y, x, box.y2)) ++
+        ySplits.map(y => DbscanRectangle(box.x, box.y, box.x2, y))
 
     logTrace(s"Possible splits: $splits")
 
@@ -154,12 +154,12 @@ class EvenSplitPartitioner(
   /**
    * Returns true if the given rectangle can be split into at least two rectangles of minimum size
    */
-  private def canBeSplit(box: DBSCANRectangle): Boolean = {
+  private def canBeSplit(box: DbscanRectangle): Boolean = {
     (box.x2 - box.x > minimumRectangleSize * 2 ||
       box.y2 - box.y > minimumRectangleSize * 2)
   }
 
-  def pointsInRectangle(space: Set[RectangleWithCount], rectangle: DBSCANRectangle): Int = {
+  def pointsInRectangle(space: Set[RectangleWithCount], rectangle: DbscanRectangle): Int = {
     space.view
       .filter({ case (current, _) => rectangle.contains(current) })
       .foldLeft(0) {
@@ -167,14 +167,14 @@ class EvenSplitPartitioner(
       }
   }
 
-  def findBoundingRectangle(rectanglesWithCount: Set[RectangleWithCount]): DBSCANRectangle = {
+  def findBoundingRectangle(rectanglesWithCount: Set[RectangleWithCount]): DbscanRectangle = {
 
     val invertedRectangle =
-      DBSCANRectangle(Double.MaxValue, Double.MaxValue, Double.MinValue, Double.MinValue)
+      DbscanRectangle(Double.MaxValue, Double.MaxValue, Double.MinValue, Double.MinValue)
 
     rectanglesWithCount.foldLeft(invertedRectangle) {
       case (bounding, (c, _)) =>
-        DBSCANRectangle(
+        DbscanRectangle(
           bounding.x.min(c.x), bounding.y.min(c.y),
           bounding.x2.max(c.x2), bounding.y2.max(c.y2))
     }
